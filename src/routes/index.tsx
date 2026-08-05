@@ -35,44 +35,102 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+  const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
-    const stored = loadLeads();
-    setLeads(stored);
-    setSelectedId(stored.sort((a, b) => b.updatedAt - a.updatedAt)[0]?.id ?? null);
-    setHydrated(true);
-  }, []);
+    if (!loading && !user) navigate({ to: "/auth" });
+  }, [loading, user, navigate]);
+
+  const persistir = useCallback(
+    (lead: Lead, userId: string) => {
+      clearTimeout(timers.current[lead.id]);
+      timers.current[lead.id] = setTimeout(() => {
+        saveLead(lead, userId).catch(() => toast.error("Falha ao salvar na nuvem"));
+      }, 600);
+    },
+    [],
+  );
 
   useEffect(() => {
-    if (hydrated) saveLeads(leads);
-  }, [leads, hydrated]);
+    if (!user) return;
+    let ativo = true;
+    (async () => {
+      try {
+        let remotos = await fetchLeads();
+
+        // Migração única das fichas que ficaram salvas só neste navegador.
+        const locais = loadLeads();
+        if (remotos.length === 0 && locais.length > 0) {
+          await Promise.all(locais.map((l) => saveLead(l, user.id)));
+          saveLeads([]);
+          remotos = await fetchLeads();
+          toast.success(`${locais.length} lead(s) migrados para a nuvem`);
+        }
+
+        if (!ativo) return;
+        setLeads(remotos);
+        setSelectedId(remotos[0]?.id ?? null);
+      } catch {
+        if (ativo) toast.error("Não foi possível carregar seus leads");
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    })();
+    return () => {
+      ativo = false;
+    };
+  }, [user]);
 
   const selected = leads.find((l) => l.id === selectedId) ?? null;
 
   const criar = () => {
+    if (!user) return;
     const lead = novoLead();
     setLeads((prev) => [lead, ...prev]);
     setSelectedId(lead.id);
+    saveLead(lead, user.id).catch(() => toast.error("Falha ao criar lead"));
   };
 
   const atualizar = (patch: Partial<Lead>) => {
-    if (!selectedId) return;
+    if (!selectedId || !user) return;
     setLeads((prev) =>
-      prev.map((l) => (l.id === selectedId ? { ...l, ...patch, updatedAt: Date.now() } : l)),
+      prev.map((l) => {
+        if (l.id !== selectedId) return l;
+        const next = { ...l, ...patch, updatedAt: Date.now() };
+        persistir(next, user.id);
+        return next;
+      }),
     );
   };
 
   const excluir = () => {
     if (!selectedId) return;
+    const id = selectedId;
     setLeads((prev) => {
-      const rest = prev.filter((l) => l.id !== selectedId);
+      const rest = prev.filter((l) => l.id !== id);
       setSelectedId(rest.sort((a, b) => b.updatedAt - a.updatedAt)[0]?.id ?? null);
       return rest;
     });
+    removeLead(id).catch(() => toast.error("Falha ao excluir na nuvem"));
   };
+
+  const sair = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  };
+
+  if (loading || !user || carregando) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Carregando…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -93,8 +151,13 @@ function Index() {
           <span className="text-xs text-muted-foreground">
             {leads.length} lead{leads.length === 1 ? "" : "s"} na base
           </span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">{user.email}</span>
+          <Button variant="ghost" size="sm" onClick={sair} className="text-xs">
+            Sair
+          </Button>
           <ThemeToggle />
         </div>
+
 
 
       </header>
