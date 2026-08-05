@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
+
 import { novoLead, type Etapa, type Lead } from "@/lib/leads";
 
 type Row = {
