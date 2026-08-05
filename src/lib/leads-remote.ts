@@ -30,7 +30,7 @@ function leadToRow(lead: Lead, userId: string) {
     nome,
     etapa,
     hubspot_url: hubspotUrl,
-    dados: dados as unknown as Record<string, unknown>,
+    dados: dados as unknown as Json,
   };
 }
 
