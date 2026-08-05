@@ -1,10 +1,16 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { LeadQueue } from "@/components/LeadQueue";
 import { LeadSheet } from "@/components/LeadSheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchLeads, removeLead, saveLead } from "@/lib/leads-remote";
 
 import { loadLeads, novoLead, saveLeads, type Lead } from "@/lib/leads";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
