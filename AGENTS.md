@@ -1,10 +1,9 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# Guia para agentes e contribuidores
+
+Stack: React + TanStack Start/Router, Vite, Tailwind CSS e Supabase.
+
+- Código da aplicação em `src/`; as rotas ficam em `src/routes/`.
+- O build estático publicado no GitHub Pages usa `pages/` com `vite.pages.config.ts` e roda no workflow `.github/workflows/pages.yml`.
+- Cada push na branch `main` dispara o deploy, então mantenha a branch sempre em estado funcional.
+- Evite reescrever histórico já publicado (force push, rebase, amend ou squash de commits já enviados).
+- Variáveis de ambiente do Supabase: `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY`.
