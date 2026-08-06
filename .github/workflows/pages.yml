@@ -29,8 +29,6 @@ jobs:
       - run: npx vite build --config vite.pages.config.ts
       - run: cp dist-pages/index.html dist-pages/404.html
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-pages
