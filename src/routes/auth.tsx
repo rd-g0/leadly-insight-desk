@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+import { cloudAuth } from "@/integrations/cloud-auth/index";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/auth")({
@@ -65,7 +65,7 @@ function AuthPage() {
   };
 
   const entrarComGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
+    const result = await cloudAuth.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
