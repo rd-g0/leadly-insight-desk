@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { cloudAuth } from "@/integrations/cloud-auth/index";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/auth")({
@@ -63,6 +64,18 @@ function AuthPage() {
     }
   };
 
+  const entrarComGoogle = async () => {
+    const result = await cloudAuth.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error("Não foi possível entrar com o Google");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/" });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6">
@@ -95,6 +108,10 @@ function AuthPage() {
             {modo === "entrar" ? "Entrar" : "Criar conta"}
           </Button>
         </form>
+
+        <Button variant="outline" className="mt-3 w-full" onClick={entrarComGoogle}>
+          Continuar com Google
+        </Button>
 
         <button
           type="button"
