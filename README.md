@@ -1,4 +1,4 @@
-# Remix of Lead Compass
+# Central de Qualificação de Leads — MySide
 
 Título: Central de Qualificação de Leads — MySide (formato helpdesk)
 
@@ -68,23 +68,23 @@ Não é wizard — todos os campos visíveis, preenchimento em qualquer ordem
 
 Estado de cada lead persiste entre sessões
 
-This project was built with [Lovable](https://lovable.dev).
+## Desenvolvimento
 
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/2a71ffd7-4252-4df2-bfa0-b363335f653c).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requisitos: Node.js 22+ e npm.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+git clone <url-do-repositório>
+cd leadly-insight-desk
+npm install
 npm run dev
 ```
+
+## Deploy
+
+O build estático publicado no GitHub Pages usa `vite.pages.config.ts` e roda automaticamente pelo workflow `.github/workflows/pages.yml` a cada push na branch `main`.
+
+```sh
+npx vite build --config vite.pages.config.ts
+```
+
+Site publicado: https://rd-g0.github.io/leadly-insight-desk/
