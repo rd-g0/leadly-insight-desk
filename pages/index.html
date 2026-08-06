@@ -12,6 +12,26 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Depois de um novo deploy o navegador pode reaproveitar um index.html antigo
+      // que aponta para um bundle que nao existe mais, deixando a pagina em branco.
+      // Se algum script ou estilo falhar ao carregar, recarrega uma unica vez.
+      (function () {
+        var CHAVE = "recarregou-assets";
+        window.addEventListener(
+          "error",
+          function (evento) {
+            var alvo = evento.target;
+            if (!alvo || (alvo.tagName !== "SCRIPT" && alvo.tagName !== "LINK")) return;
+            var ultimo = Number(sessionStorage.getItem(CHAVE) || 0);
+            if (Date.now() - ultimo < 30000) return;
+            sessionStorage.setItem(CHAVE, String(Date.now()));
+            location.reload();
+          },
+          true,
+        );
+      })();
+    </script>
     <script type="module" src="./main.tsx"></script>
   </body>
 </html>
